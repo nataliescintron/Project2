@@ -193,6 +193,16 @@
         state: absent
         login_unix_socket: "{{ mysql_socket }}"
 
+    - name: Sudoers — scope the cloud-init rule to the commands still needed
+      ansible.builtin.copy:
+        dest: /etc/sudoers.d/90-cloud-init-users
+        content: |
+          ubuntu ALL=(ALL) NOPASSWD: /usr/bin/ansible-pull, /usr/bin/bash check.sh
+        owner: root
+        group: root
+        mode: "0440"
+        validate: /usr/sbin/visudo -cf %s
+
   handlers:
     - name: Restart ssh
       ansible.builtin.service:
